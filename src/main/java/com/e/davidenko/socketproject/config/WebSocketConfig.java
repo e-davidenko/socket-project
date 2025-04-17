@@ -15,13 +15,18 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        // Включаем простой брокер сообщений для очередей (queue) и тем (topic)
+        registry.enableSimpleBroker("/queue", "/topic");
+        // Префикс для сообщений приложения
+        registry.setApplicationDestinationPrefixes("/app");
+        // Префикс для пользовательских сообщений
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket");
+        // Настройка SockJS для WebSocket
+        registry.addEndpoint("/ws");
     }
 }

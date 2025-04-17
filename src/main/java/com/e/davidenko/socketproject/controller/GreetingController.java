@@ -1,21 +1,35 @@
 package com.e.davidenko.socketproject.controller;
 
-import com.e.davidenko.socketproject.model.Greeting;
-import com.e.davidenko.socketproject.model.HelloMessage;
+import com.e.davidenko.socketproject.dto.MessageDto;
+import com.e.davidenko.socketproject.mappers.MessageMapper;
+import com.e.davidenko.socketproject.service.MessageService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.util.HtmlUtils;
+
+import java.security.Principal;
 
 @Controller
+@RequiredArgsConstructor
 public class GreetingController {
 
+    private final MessageService messageService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final MessageMapper mapper;
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public Greeting greeting(HelloMessage message) throws Exception {
-        Thread.sleep(1000); // simulated delay
-        return new Greeting("Hello, " + HtmlUtils.htmlEscape(message.getName()) + "!");
+    @MessageMapping("/send")
+    @SendToUser("/queue/messages")
+    public String sendMessage(@Payload MessageDto message, Principal user) {
+        System.out.println("user = " + user);
+        //fixme временно
+        var recipient = message.recipient() == null ? "user" : message.recipient();
+
+        messagingTemplate.convertAndSendToUser(recipient, "/queue/messages", message);
+        return ("Message Delivered!");
     }
+
 
 }
