@@ -1,5 +1,7 @@
 package com.e.davidenko.socketproject.controller;
 
+import com.e.davidenko.socketproject.model.Greeting;
+import com.e.davidenko.socketproject.model.HelloMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
