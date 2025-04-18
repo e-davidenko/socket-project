@@ -5,10 +5,16 @@ const stompClient = new StompJs.Client({
 stompClient.onConnect = (frame) => {
     setConnected(true);
     console.log('Connected: ' + frame);
+    // канал для сообщений
     stompClient.subscribe('/user/queue/messages', (greeting) => {
         showGreeting(JSON.parse(greeting.body).content);
     });
+  // канал для уведомлений
+    stompClient.subscribe('/user/queue/notifications', (greeting) => {
+        messageDelivered(greeting)
+    });
 };
+
 
 stompClient.onWebSocketError = (error) => {
     console.error('Error with websocket', error);
@@ -44,12 +50,16 @@ function disconnect() {
 function sendName() {
     stompClient.publish({
         destination: "/app/send",
-        body: JSON.stringify({'name': $("#name").val()})
+        body: JSON.stringify({'content': $("#content").val(), 'recipient': $("#recipient").val()})
     });
 }
 
 function showGreeting(message) {
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
+}
+
+function messageDelivered(message) {
+    console.log("delivered")
 }
 
 $(function () {
